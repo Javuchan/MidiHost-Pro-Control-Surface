@@ -22,7 +22,18 @@ async function startServer() {
 
   // API routes FIRST
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", env: isProduction ? 'production' : 'development' });
+    const distPath = path.join(process.cwd(), "dist");
+    const indexExists = fs.existsSync(path.join(distPath, "index.html"));
+    res.json({
+      status: "ok",
+      env: isProduction ? 'production' : 'development',
+      railway: !!process.env.RAILWAY_ENVIRONMENT,
+      port: PORT,
+      cwd: process.cwd(),
+      distExists: fs.existsSync(distPath),
+      indexExists: indexExists,
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Socket.IO logic
