@@ -1,7 +1,14 @@
-{
-  "name": "MidiHost Pro Control Surface by Javuchan",
-  "description": "Bridge the gap between your mobile device and your digital audio workstation with a high-fidelity, browser-based control surface. Designed for precision and low-latency performance, this interface utilizes the industry-standard Mackie Control Universal (MCU) protocol to provide comprehensive remote DAW integration via mobile browsers.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
-}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MidiHost Pro Control - Reaper Edition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

@@ -1,79 +1,20 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MidiHost Pro Control - Reaper Edition</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #0a0a0a;
-            color: #f8fafc;
-            overflow: hidden;
-            user-select: none;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 48px;
-            width: 32px;
-            border-radius: 4px;
-            background: linear-gradient(to bottom, #d1d5db 48%, #000 48%, #000 52%, #d1d5db 52%);
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.8), inset 0 1px 0 white;
-            border: 2px solid #1f2937;
-        }
-        @media (min-width: 640px) {
-            input[type=range]::-webkit-slider-thumb {
-                height: 38px;
-                width: 26px;
-                border-radius: 2px;
-                background: linear-gradient(to bottom, #d1d5db 48%, #000 48%, #000 52%, #d1d5db 52%);
-            }
-        }
-        .fader-track {
-            background: #000;
-            width: 2px;
-            margin: 0 auto;
-            height: 100%;
-            position: relative;
-            box-shadow: 1px 0 0 #333, -1px 0 0 #333;
-        }
-        .oled-display {
-            font-family: 'Courier New', Courier, monospace;
-            background: #000;
-            color: #526d4f;
-            text-shadow: 0 0 3px #526d4f;
-        }
-        @keyframes spin-slow {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin-slow {
-            animation: spin-slow 8s linear infinite;
-        }
-        .touch-pan-y {
-            touch-action: pan-y;
-        }
-        .touch-none {
-            touch-action: none;
-        }
-    </style>
-<script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.37.0"
+import { GoogleGenAI, Type } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+export async function getMidiAssistance(query: string, mode: string) {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `User asks: ${query}. Current control mode: ${mode}. Provide brief, expert instructions on how to set up REAPER (Preferences > Control/OSC/web) using Mackie Control Universal (MCU) with this web interface and virtual MIDI cables (like loopMIDI or IAC). Explain how to enable the MIDI ports in REAPER.`,
+      config: {
+        systemInstruction: "You are a REAPER DAW expert and MIDI specialist. You help users configure their web-based control surfaces. Use concise markdown and focus on REAPER-specific terminology like 'Action List', 'Control Surface Settings', and 'Track Banking'.",
+      }
+    });
+    return response.text;
+  } catch (error) {
+    console.error("Gemini Error:", error);
+    return "Could not fetch assistance. Check your internet connection.";
   }
 }
-</script>
-<link rel="stylesheet" href="/index.css">
-</head>
-<body>
-    <div id="root"></div>
-<script type="module" src="/index.tsx"></script>
-</body>
-</html>
