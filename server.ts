@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
-    "start": "tsx server.ts"
+    "start": "NODE_ENV=production tsx server.ts"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -16,7 +16,7 @@
   "dependencies": {
     "@google/genai": "^1.37.0",
     "@tailwindcss/vite": "^4.2.2",
-    "express": "^5.2.1",
+    "express": "^4.18.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "socket.io": "^4.8.3",

@@ -2,6 +2,7 @@ import express from "express";
 import { Server } from "socket.io";
 import http from "http";
 import path from "path";
+import fs from "fs";
 
 async function startServer() {
   const app = express();
@@ -13,10 +14,15 @@ async function startServer() {
     }
   });
   const PORT = process.env.PORT || 3000;
+  const isProduction = process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT !== undefined;
+
+  console.log(`Starting server in ${isProduction ? 'production' : 'development'} mode...`);
+  console.log(`Port: ${PORT}`);
+  console.log(`CWD: ${process.cwd()}`);
 
   // API routes FIRST
   app.get("/api/health", (req, res) => {
-    res.json({ status: "ok" });
+    res.json({ status: "ok", env: isProduction ? 'production' : 'development' });
   });
 
   // Socket.IO logic
@@ -48,9 +54,8 @@ async function startServer() {
   });
 
   // Vite middleware for development
-  const isProduction = process.env.NODE_ENV === "production" || process.env.RAILWAY_ENVIRONMENT !== undefined;
-
   if (!isProduction) {
+    console.log("Loading Vite middleware...");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -59,15 +64,29 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
+    console.log(`Serving static files from: ${distPath}`);
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).send('Build not found. Please ensure "npm run build" has completed.');
+      }
     });
   }
 
-  server.listen(Number(PORT), "0.0.0.0", () => {
-    console.log(`Server running on port ${PORT}`);
-  });
+  try {
+    server.listen(Number(PORT), "0.0.0.0", () => {
+      console.log(`Server successfully started and listening on 0.0.0.0:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 }
 
-startServer();
+startServer().catch(err => {
+  console.error("Async startServer failed:", err);
+  process.exit(1);
+});
