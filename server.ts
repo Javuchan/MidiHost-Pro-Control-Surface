@@ -10,6 +10,9 @@
     "preview": "vite preview",
     "start": "tsx server.ts"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "@google/genai": "^1.37.0",
     "@tailwindcss/vite": "^4.2.2",
